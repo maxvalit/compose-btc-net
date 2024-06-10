@@ -1,0 +1,108 @@
+version: '3'
+
+services:
+  bitcoin_miner:
+    build:
+      context: BTCNode
+      dockerfile: ./Dockerfile
+    environment:
+      - RPCUSER=myrpcuser
+      - RPCPASSWORD=myrpcpassword
+      - RPCPORT=8332
+      - NETWORK=regtest # Change to testnet or regtest if needed
+      - MINE=1
+      - ADDNODES=bitcoin_node1 bitcoin_node2
+    ports:
+      - "8332:8332"
+      - "8333:8333"
+    volumes:
+      - ./btcdata/bitcoin-data-miner:/bitcoin
+    networks:
+      - bitcoin_net
+
+  bitcoin_node1:
+    build:
+      context: BTCNode
+      dockerfile: ./Dockerfile
+    environment:
+      - RPCUSER=myrpcuser
+      - RPCPASSWORD=myrpcpassword
+      - RPCPORT=18332
+      - NETWORK=regtest # Change to testnet or regtest if needed
+      - ADDNODES=bitcoin_miner
+    ports:
+      - "18332:18332"
+      - "18333:18333"
+    volumes:
+      - ./btcdata/bitcoin-data-node1:/bitcoin
+    networks:
+      - bitcoin_net
+
+  bitcoin_node2:
+    build:
+      context: BTCNode
+      dockerfile: ./Dockerfile
+    environment:
+      - RPCUSER=myrpcuser
+      - RPCPASSWORD=myrpcpassword
+      - RPCPORT=28332
+      - NETWORK=regtest # Change to testnet or regtest if needed
+      - ADDNODES=bitcoin_miner
+    ports:
+      - "28332:28332"
+      - "28333:28333"
+    volumes:
+      - ./btcdata/bitcoin-data-node2:/bitcoin
+    networks:
+      - bitcoin_net
+
+  
+  wallet_miner:
+    build:
+      context: BTCWebWallet
+      dockerfile: ./Dockerfile
+
+    environment:
+      - RPC__HOST=bitcoin_miner
+      - RPC__PORT=8332
+      - RPC__USER=myrpcuser
+      - RPC__PWD=myrpcpassword
+    ports:
+      - "9998:9999"
+
+    networks:
+      - bitcoin_net
+
+  wallet_node1:
+    build:
+      context: BTCWebWallet
+      dockerfile: ./Dockerfile
+
+    environment:
+      - RPC__HOST=bitcoin_node1
+      - RPC__PORT=18332
+      - RPC__USER=myrpcuser
+      - RPC__PWD=myrpcpassword
+    ports:
+      - "19998:9999"
+    networks:
+      - bitcoin_net
+
+  wallet_node2:
+    build:
+      context: BTCWebWallet
+      dockerfile: ./Dockerfile
+
+    environment:
+      - RPC__HOST=bitcoin_node2
+      - RPC__PORT=28332
+      - RPC__USER=myrpcuser
+      - RPC__PWD=myrpcpassword
+    ports:
+      - "29998:9999"
+    networks:
+      - bitcoin_net
+
+networks:
+  bitcoin_net:
+    driver: bridge

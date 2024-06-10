@@ -1,0 +1,3 @@
+[submodule "BTCWebWallet"]
+	path = BTCWebWallet
+	url = git@github.com:maxvalit/BTCWebWallet.git

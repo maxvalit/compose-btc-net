@@ -36,6 +36,7 @@ if ! ./bitcoin-27.0/bin/bitcoin-cli -datadir=/bitcoin -rpcuser=${RPCUSER} -rpcpa
   echo "Creating wallet ${WALLET_NAME}"
   ./bitcoin-27.0/bin/bitcoin-cli -datadir=/bitcoin -rpcuser=${RPCUSER} -rpcpassword=${RPCPASSWORD} createwallet ${WALLET_NAME} || true
   if [ "$MINE" -eq 1 ]; then
+  
       ./bitcoin-27.0/bin/bitcoin-cli -datadir=/bitcoin -rpcuser=${RPCUSER} -rpcpassword=${RPCPASSWORD} -rpcport=${RPCPORT} -generate 100 
   fi
 else

@@ -103,6 +103,18 @@ services:
     networks:
       - bitcoin_net
 
+  explorer:
+    build: 
+      context: btc-rpc-explorer
+      dockerfile: Dockerfile
+    environment:
+      - BTCEXP_BITCOIND_URI=bitcoin://myrpcuser:myrpcpassword@bitcoin_node2:28332
+      - BTCEXP_HOST=0.0.0.0
+    ports:
+      - "29988:3002"
+    networks:
+      - bitcoin_net
+
 networks:
   bitcoin_net:
     driver: bridge

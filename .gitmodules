@@ -1,3 +1,6 @@
 [submodule "BTCWebWallet"]
 	path = BTCWebWallet
 	url = git@github.com:maxvalit/BTCWebWallet.git
+[submodule "btc-rpc-explorer"]
+	path = btc-rpc-explorer
+	url = https://github.com/janoside/btc-rpc-explorer.git

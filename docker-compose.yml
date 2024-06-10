@@ -9,7 +9,7 @@ services:
       - RPCUSER=myrpcuser
       - RPCPASSWORD=myrpcpassword
       - RPCPORT=8332
-      - NETWORK=regtest # Change to testnet or regtest if needed
+      - NETWORK=regtest 
       - MINE=1
       - ADDNODES=bitcoin_node1 bitcoin_node2
     ports:
@@ -28,7 +28,7 @@ services:
       - RPCUSER=myrpcuser
       - RPCPASSWORD=myrpcpassword
       - RPCPORT=18332
-      - NETWORK=regtest # Change to testnet or regtest if needed
+      - NETWORK=regtest 
       - ADDNODES=bitcoin_miner
     ports:
       - "18332:18332"
@@ -46,7 +46,7 @@ services:
       - RPCUSER=myrpcuser
       - RPCPASSWORD=myrpcpassword
       - RPCPORT=28332
-      - NETWORK=regtest # Change to testnet or regtest if needed
+      - NETWORK=regtest 
       - ADDNODES=bitcoin_miner
     ports:
       - "28332:28332"

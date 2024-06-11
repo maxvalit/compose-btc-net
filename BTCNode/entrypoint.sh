@@ -22,6 +22,7 @@ rpcport=${RPCPORT}
 rpcbind=0.0.0.0:${RPCPORT}
 rpcallowip=0.0.0.0/0
 wallet=testwallet
+fallbackfee=0.00005
 EOF
 
 IFS=' ' read -r -a ADDNODE_ARRAY <<< "$ADDNODES"
@@ -32,27 +33,38 @@ done
 # Start bitcoind
 ./bitcoin-27.0/bin/bitcoind -datadir=/bitcoin &
 
+
+
+
 if ! ./bitcoin-27.0/bin/bitcoin-cli -datadir=/bitcoin -rpcuser=${RPCUSER} -rpcpassword=${RPCPASSWORD} -rpcwait listwallets | grep -q "\"${WALLET_NAME}\""; then
   echo "Creating wallet ${WALLET_NAME}"
   ./bitcoin-27.0/bin/bitcoin-cli -datadir=/bitcoin -rpcuser=${RPCUSER} -rpcpassword=${RPCPASSWORD} createwallet ${WALLET_NAME} || true
-  if [ "$MINE" -eq 1 ]; then
   
-      ./bitcoin-27.0/bin/bitcoin-cli -datadir=/bitcoin -rpcuser=${RPCUSER} -rpcpassword=${RPCPASSWORD} -rpcport=${RPCPORT} -generate 100 
-  fi
 else
   echo "Loading wallet ${WALLET_NAME}"
   ./bitcoin-27.0/bin/bitcoin-cli -datadir=/bitcoin -rpcuser=${RPCUSER} -rpcpassword=${RPCPASSWORD} loadwallet ${WALLET_NAME} || true
 fi
-
+if [ "$MINE" -eq 1 ]; then
+  sleep 5
+  blocks=$(./bitcoin-27.0/bin/bitcoin-cli -datadir=/bitcoin -rpcuser=${RPCUSER} -rpcpassword=${RPCPASSWORD} -rpcport=${RPCPORT} getblockchaininfo | tee | jq '.blocks')
+  echo "blocks $blocks"
+  if [ "$blocks" -eq 0 ]; then
+    ./bitcoin-27.0/bin/bitcoin-cli -datadir=/bitcoin -rpcuser=${RPCUSER} -rpcpassword=${RPCPASSWORD} -rpcport=${RPCPORT} -generate 120  
+  fi
+fi
 # Function to mine blocks if MINE=1
 mine_blocks() {
     sleep 5
     while true; do
         if [ "$MINE" -eq 1 ]; then
+          size=$(./bitcoin-27.0/bin/bitcoin-cli -datadir=/bitcoin -rpcuser=${RPCUSER} -rpcpassword=${RPCPASSWORD} -rpcport=${RPCPORT} getmempoolinfo  |tee| jq '.size')
+
+          if [[ "$size" -ne 0 ]]; then
             echo "Gonna mine!"
-            ./bitcoin-27.0/bin/bitcoin-cli -datadir=/bitcoin -rpcuser=${RPCUSER} -rpcpassword=${RPCPASSWORD} -rpcport=${RPCPORT} -generate 1
+            ./bitcoin-27.0/bin/bitcoin-cli -datadir=/bitcoin -rpcuser=${RPCUSER} -rpcpassword=${RPCPASSWORD} -rpcport=${RPCPORT} -generate 2
+          fi
         fi
-        sleep 10
+        sleep 2
     done
 }
 

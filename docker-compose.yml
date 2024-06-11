@@ -1,7 +1,8 @@
-version: '3'
+version: '3.8'
 
 services:
   bitcoin_miner:
+    image: mybitcoinimage
     build:
       context: BTCNode
       dockerfile: ./Dockerfile
@@ -21,9 +22,7 @@ services:
       - bitcoin_net
 
   bitcoin_node1:
-    build:
-      context: BTCNode
-      dockerfile: ./Dockerfile
+    image: mybitcoinimage
     environment:
       - RPCUSER=myrpcuser
       - RPCPASSWORD=myrpcpassword
@@ -39,9 +38,7 @@ services:
       - bitcoin_net
 
   bitcoin_node2:
-    build:
-      context: BTCNode
-      dockerfile: ./Dockerfile
+    image: mybitcoinimage
     environment:
       - RPCUSER=myrpcuser
       - RPCPASSWORD=myrpcpassword
@@ -56,8 +53,11 @@ services:
     networks:
       - bitcoin_net
 
+
   
   wallet_miner:
+    image: mybitcoinwalletimage
+    
     build:
       context: BTCWebWallet
       dockerfile: ./Dockerfile
@@ -69,14 +69,13 @@ services:
       - RPC__PWD=myrpcpassword
     ports:
       - "9998:9999"
-
+    depends_on:
+      - bitcoin_miner
     networks:
       - bitcoin_net
 
   wallet_node1:
-    build:
-      context: BTCWebWallet
-      dockerfile: ./Dockerfile
+    image: mybitcoinwalletimage
 
     environment:
       - RPC__HOST=bitcoin_node1
@@ -87,11 +86,13 @@ services:
       - "19998:9999"
     networks:
       - bitcoin_net
+    
+    depends_on:
+      - wallet_miner
+      - bitcoin_node1
 
   wallet_node2:
-    build:
-      context: BTCWebWallet
-      dockerfile: ./Dockerfile
+    image: mybitcoinwalletimage
 
     environment:
       - RPC__HOST=bitcoin_node2
@@ -102,7 +103,9 @@ services:
       - "29998:9999"
     networks:
       - bitcoin_net
-
+    depends_on:
+      - wallet_miner
+      - bitcoin_node2
   explorer:
     build: 
       context: btc-rpc-explorer
